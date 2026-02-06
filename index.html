@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Valentine's Challenge</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg1: #ffd6e7;
+      --bg2: #ffeef6;
+      --card: #ffffffcc;
+      --pink-main: #ff3b7a;
+      --pink-hover: #ff1f68;
+      --grey-text: #666; /* Grey color for the specific lines */
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at top, var(--bg2), var(--bg1));
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      padding: 16px;
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .card {
+      width: min(720px, 92vw);
+      padding: 35px 25px;
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      text-align: center;
+      box-shadow: 0 18px 60px rgba(0,0,0,.15);
+    }
+
+    .art {
+      width: min(160px, 45vw);
+      margin: 0 auto 10px;
+      display: block;
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.12));
+    }
+
+    h1 {
+      font-size: clamp(20px, 4vw, 32px);
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    .button-zone {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      margin: 0 auto;
+      touch-action: none;
+    }
+
+    button {
+      position: absolute;
+      padding: 15px 40px;
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,.1);
+      transition: transform .15s ease, background .4s ease, left 0.25s ease, top 0.25s ease;
+    }
+
+    #yesBtn {
+      left: 30%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--pink-main);
+      color: white;
+      z-index: 10;
+    }
+
+    #noBtn {
+      left: 70%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--pink-main);
+      color: white;
+    }
+
+    .hint {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #888;
+      font-style: italic;
+    }
+
+    .section { display: none; }
+    .active { display: block; animation: pop .4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+    .angry-text {
+      font-size: 24px;
+      color: #d63384;
+      font-weight: bold;
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+
+    .retry-btn {
+      position: relative;
+      background: var(--pink-main);
+      color: white;
+      padding: 12px 40px;
+      display: inline-block;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 800;
+      box-shadow: 0 5px 15px rgba(255, 59, 122, 0.3);
+    }
+
+    .fireworks {
+      width: 100%;
+      max-width: 340px;
+      border: 5px solid #000;
+      border-radius: 15px;
+      margin: 15px auto;
+      display: block;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confettiCanvas"></canvas>
+
+  <main class="card">
+    
+    <div id="state-main" class="section active">
+      <svg class="art" viewBox="0 0 320 240">
+        <defs>
+          <linearGradient id="fur" x1="0" x2="1"><stop offset="0" stop-color="#f7c7a1"/><stop offset="1" stop-color="#f2a97b"/></linearGradient>
+          <linearGradient id="heart" x1="0" x2="1"><stop offset="0" stop-color="#ff4d7d"/><stop offset="1" stop-color="#ff1f68"/></linearGradient>
+        </defs>
+        <path d="M250 50 C250 33 270 25 282 38 C294 25 314 33 314 50 C314 78 282 92 282 106 C282 92 250 78 250 50Z" fill="url(#heart)"/>
+        <path d="M90 120 C90 70 140 40 190 60 C240 40 290 70 290 120 C290 180 240 210 190 210 C140 210 90 180 90 120Z" fill="url(#fur)"/>
+        <circle cx="160" cy="130" r="8"/><circle cx="220" cy="130" r="8"/>
+        <path d="M190 144 C186 144 182 148 182 152 C182 160 190 164 190 170 C190 164 198 160 198 152 C198 148 194 144 190 144Z" fill="#ff7aa2"/>
+      </svg>
+      <h1>Ashwin ji will you be my valentine?</h1>
+      
+      <div class="button-zone" id="zone">
+        <button id="yesBtn">No</button>
+        <button id="noBtn">Yes</button>
+      </div>
+
+      <div class="hint">hint: Yes is bit shy 🫣</div>
+    </div>
+
+    <div id="state-angry" class="section">
+      <div class="angry-text">
+        mujhe pata tha tu kisi aur ke saath valentine manayega 😤<br>
+        <span style="color: var(--grey-text); font-weight: bold; font-size: 18px;">Ek baar phirse try kar</span>
+      </div>
+      <button class="retry-btn" onclick="resetGame()">Retry</button>
+    </div>
+
+    <div id="state-success" class="section">
+      <h3 style="color: var(--pink-main); margin-bottom: 10px;">Tu mere se pyaar hi kahan karta hai!</h3>
+      <img class="fireworks" src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ2tlNDl2YjZ1eWU4ZG5rZWJta2oxMmMwa3N4dWdzOWxjcWc0b3MxMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ieW5dfu5bWoP6/giphy.gif" alt="Funny Reaction">
+      <p style="color: var(--grey-text); font-weight: bold; margin-top: 15px;">Fine, Happy Valentine's week!</p>
+    </div>
+
+  </main>
+
+  <script>
+    const stateMain = document.getElementById("state-main");
+    const stateAngry = document.getElementById("state-angry");
+    const stateSuccess = document.getElementById("state-success");
+    
+    const zone = document.getElementById("zone");
+    const yesBtn = document.getElementById("yesBtn"); 
+    const noBtn = document.getElementById("noBtn");   
+    
+    let attemptCount = 1;
+    let yesScale = 1;
+
+    yesBtn.addEventListener("click", () => {
+      showSection("state-angry");
+    });
+
+    noBtn.addEventListener("click", () => {
+      if(attemptCount >= 2) {
+        showSection("state-success");
+        runConfetti();
+      }
+    });
+
+    function resetGame() {
+      attemptCount++; 
+      yesScale = 1;
+      yesBtn.style.transform = `translate(-50%, -50%) scale(1)`;
+      noBtn.style.backgroundColor = `var(--pink-main)`;
+      noBtn.style.color = `white`;
+      
+      noBtn.style.left = "70%";
+      noBtn.style.top = "50%";
+      yesBtn.style.left = "30%";
+      yesBtn.style.top = "50%";
+
+      showSection("state-main");
+    }
+
+    function showSection(id) {
+      [stateMain, stateAngry, stateSuccess].forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    zone.addEventListener("pointermove", (e) => {
+      const b = noBtn.getBoundingClientRect();
+      const distance = Math.hypot((b.left + b.width / 2) - e.clientX, (b.top + b.height / 2) - e.clientY);
+
+      if (distance < 150) {
+        handleMove(e.clientX, e.clientY);
+      }
+    });
+
+    function handleMove(cursorX, cursorY) {
+      const z = zone.getBoundingClientRect();
+      const noRect = noBtn.getBoundingClientRect();
+
+      if (attemptCount === 1) {
+        let newX = cursorX < (z.left + z.width/2) ? (z.width * 0.85) : (z.width * 0.15);
+        noBtn.style.left = newX + "px";
+        noBtn.style.top = "50%";
+      } else {
+        let dx = (noRect.left + noRect.width / 2) - cursorX;
+        let dy = (noRect.top + noRect.height / 2) - cursorY;
+        let mag = Math.hypot(dx, dy) || 1;
+        let targetX = (noRect.left - z.left) + (dx / mag) * 160;
+        let targetY = (noRect.top - z.top) + (dy / mag) * 160;
+
+        noBtn.style.left = Math.max(0, Math.min(z.width - noRect.width, targetX)) + "px";
+        noBtn.style.top = Math.max(0, Math.min(z.height - noRect.height, targetY)) + "px";
+      }
+
+      yesScale = Math.min(2.5, yesScale + 0.1);
+      yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
+
+      const progress = (yesScale - 1) / (2.5 - 1);
+      const g = Math.round(59 + (214 - 59) * progress);
+      const b_val = Math.round(122 + (231 - 122) * progress);
+      noBtn.style.backgroundColor = `rgb(255, ${g}, ${b_val})`;
+      if (progress > 0.6) noBtn.style.color = "var(--pink-main)";
+    }
+
+    function runConfetti() {
+      const canvas = document.getElementById("confettiCanvas");
+      const myConfetti = confetti.create(canvas, { resize: true });
+      myConfetti({ particleCount: 200, spread: 160, origin: { y: 0.6 }, colors: ['#ff3b7a', '#ffffff'] });
+    }
+  </script>
+</body>
+</html>
